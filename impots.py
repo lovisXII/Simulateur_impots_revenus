@@ -1,4 +1,5 @@
 
+import argparse
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -51,17 +52,21 @@ def new_tax(wage) :
         tax_to_pay += (wage - 411683) * 0.9
     return tax_to_pay
 
+def parse_arguments():
+    parser = argparse.ArgumentParser(description='Calcule et trace l\'impot sur le revenu avec l\'ancien et le nouveau system de tranche')
+    parser.add_argument('--min', type=int, default=0, help='Salaire minimum de la courbe')
+    parser.add_argument('--max', type=int, default=500000, help='Salaire maximum de la courbe')
+    parser.add_argument('--nbr_points', type=int, default=10000, help='Nombre de points')
+    return parser.parse_args()
 
 if __name__ == "__main__":
-    wages = np.linspace(1_0000, 48_000, 10)  # 10000 points between 0 and 500,000
+    args = parse_arguments()
+    wages = np.linspace(args.min, args.max, args.nbr_points)  # 10000 points between 0 and 500,000
     newTax = []
     oldTax = []
     for wage in wages:
         newTax.append(new_tax(wage))
         oldTax.append(old_tax(wage))
-        print(wage)
-        print(new_tax(wage))
-        print(old_tax(wage))
     plt.figure(figsize=(10, 6))
     plt.plot(wages, newTax, label='New Tax', color='blue')
     plt.plot(wages, oldTax, label='Old Tax', color='red')
