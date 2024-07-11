@@ -63,7 +63,7 @@ def plot_tax_comparison(wages, new_tax_values, old_tax_values):
     ax.legend()
     ax.grid()
     # Add interactive cursors
-    mplcursors.cursor().connect("add",lambda sel: sel.annotation.set_text(f"Salaire annuel : {round(sel.target[0], 2)}, taxe : {round(sel.target[0], 2)}" ))
+    mplcursors.cursor().connect("add",lambda sel: sel.annotation.set_text(f"Salaire annuel : {round(sel.target[0], 2)}, taxe : {round(sel.target[1], 2)}" ))
 
     plt.show()
 
