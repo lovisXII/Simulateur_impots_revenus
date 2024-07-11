@@ -2,6 +2,7 @@
 import argparse
 import matplotlib.pyplot as plt
 import numpy as np
+import mplcursors
 
 def old_tax(wage) :
     tax_to_pay = 0
@@ -52,11 +53,25 @@ def new_tax(wage) :
         tax_to_pay += (wage - 411683) * 0.9
     return tax_to_pay
 
+def plot_tax_comparison(wages, new_tax_values, old_tax_values):
+    # Plot the data
+    fig, ax = plt.subplots()
+    scatter_new = ax.scatter(wages, new_tax_values, label='Systeme de taxation actuel', color='blue')
+    scatter_old = ax.scatter(wages, old_tax_values, label='Systeme de taxation du nfp', color='red')
+    ax.set_xlabel('Salaire en euros')
+    ax.set_ylabel('Tax en euros')
+    ax.legend()
+    ax.grid()
+    # Add interactive cursors
+    mplcursors.cursor().connect("add",lambda sel: sel.annotation.set_text(f"Salaire annuel : {round(sel.target[0], 2)}, taxe : {round(sel.target[0], 2)}" ))
+
+    plt.show()
+
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Calcule et trace l\'impot sur le revenu avec l\'ancien et le nouveau system de tranche')
-    parser.add_argument('-s', type=int, default=0, help='Valeur seule, prends une valeur de salaire et donne les valeurs de l\'ancien vs nouveau systeme')
-    parser.add_argument('--min', type=int, default=0, help='Salaire minimum de la courbe')
-    parser.add_argument('--max', type=int, default=500000, help='Salaire maximum de la courbe')
+    parser.add_argument('-s'          , type=int, default=0, help='Valeur seule, prends une valeur de salaire et donne les valeurs de l\'ancien vs nouveau systeme')
+    parser.add_argument('--min'       , type=int, default=0, help='Salaire minimum de la courbe')
+    parser.add_argument('--max'       , type=int, default=500000, help='Salaire maximum de la courbe')
     parser.add_argument('--nbr_points', type=int, default=10000, help='Nombre de points')
     return parser.parse_args()
 
@@ -66,19 +81,11 @@ if __name__ == "__main__":
         wages = np.linspace(args.min, args.max, args.nbr_points)  # 10000 points between 0 and 500,000
         newTax = []
         oldTax = []
-        for wage in wages:
-            newTax.append(new_tax(wage))
-            oldTax.append(old_tax(wage))
-        plt.figure(figsize=(10, 6))
-        plt.plot(wages, newTax, label='New Tax', color='blue')
-        plt.plot(wages, oldTax, label='Old Tax', color='red')
+        newTax = [new_tax(wage) for wage in wages]
+        oldTax = [old_tax(wage) for wage in wages]
 
-        # Adding titles and labels
-        plt.title('Comparison of Old and New Tax Systems')
-        plt.xlabel('Wage (in euros/year)')
-        plt.ylabel('Tax (in euros)')
-        plt.legend()
-        plt.grid(True)
+        plot_tax_comparison(wages, newTax, oldTax)
+
         plt.show()
     else :
         print("Salaire entre : ", args.s)
